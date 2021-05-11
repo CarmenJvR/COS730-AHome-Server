@@ -7,12 +7,20 @@ const api = apiAdapter(BASE_URL)
 
 // Configuration for PostgreSQL connection
 const Pool = require('pg').Pool
-const pool = new Pool({
+/**const pool = new Pool({
   user: 'sysadmin',
   host: 'localhost',
   database: 'api',
   password: '1234',
   port: 5433,
+}) */
+
+const pool = new Pool({
+  user: 'pgaxpsatnseowx',
+  host: 'ec2-54-87-112-29.compute-1.amazonaws.com',
+  database: 'd39nnkf0mutqeb',
+  password: '362f62bcb82039dc15bc2e06d77ada18b3e307dd96ba6d1abd970e551b76ab3c',
+  port: 5432
 })
 
 // Cryptography Dependencies
