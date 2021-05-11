@@ -57,5 +57,41 @@ router.get('/account', (req, res) => {
   });
 
 
+  router.post('/loginAccount', (request, response) => {
+    
+    const pwd =  request.body.password;
+    let hash = crypto.createHash('sha256').update(pwd).digest('base64');
+    var today = new Date(new Date().getTime()+(5*24*60*60*1000));
+    var tk = crypto.randomBytes(20).toString('hex') ;
+    const valuesR1 = [request.body.email, hash ]
+    const valuesR2 = [ tk , today,request.body.email ]
+
+    pool.query('SELECT * FROM account WHERE email = $1 AND password = $2', valuesR1, (error, results) => {
+      if (error) {
+        throw error
+      }
+
+      if (results.rowCount == 0){
+        response.status(404).json("Account not found")
+      }else{
+       // response.status(200).json(results.rows)
+//expiration needs to be added -> 
+        pool.query('UPDATE account SET accessToken = $1 , expiration = $2 WHERE email = $3', valuesR2,
+            (error, results) => {
+            if (error) {
+                throw error
+            }
+            var res = { accessToken: tk };
+
+            response.status(201).send( JSON.stringify(res))
+            }
+        )
+
+       
+      }
+      
+    })
+  });
+
 
 module.exports = router
