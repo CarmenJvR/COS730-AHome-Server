@@ -16,16 +16,9 @@ const pool = new Pool({
 })
 
 // Cryptography Dependencies
-//const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
-
-router.get('/account', (req, res) => {
-    api.get(req.path).then(resp => {
-      res.send(resp.data)
-    })
-  })
-
+//API: Get All Accounts
   router.get('/getAccounts', (req, res) => {
     pool.query('SELECT * FROM account ORDER BY id ASC', (error, results) => {
         if (error) {
@@ -35,7 +28,7 @@ router.get('/account', (req, res) => {
       })
   })
 
-
+//API: Register New User
   router.post('/createAccount', (request, response) => {
     const pwd =  request.body.password;
 
@@ -44,18 +37,72 @@ router.get('/account', (req, res) => {
     var tk = crypto.randomBytes(20).toString('hex') ;
     var today = new Date(new Date().getTime()+(5*24*60*60*1000));
     const values = [request.body.email, hash, tk , today  ]
+    const value = [request.body.email]
 
-    pool.query('INSERT INTO account (email, password, accessToken, expiration) VALUES ($1, $2, $3, $4)', values ,(error, results) => {
-      if (error) {
-       //throw error
-       response.status(404).send(`Could not Insert new user`  )
-      }
+    //work here
+    pool.query('SELECT * FROM account WHERE email=$1', value ,(error, results) => {
+        if (error) {
+         throw error
+        }
 
-      var res = { accessToken: tk };
-      response.status(201).send( JSON.stringify(res))
-    })
+        if (results.rowCount > 0){
+          //Email Already used: Reject Register
+          response.status(404).send( JSON.stringify({message: `Could Not Register: Email already in use`}) )
+        }else{
+            //Email Not Used: Create Account
+            pool.query('INSERT INTO account (email, password, accessToken, expiration) VALUES ($1, $2, $3, $4)', values ,(error, results) => {
+              if (error) {
+               //throw error
+               response.status(404).send( JSON.stringify({message: `Could Not Register: Could not Insert new user`})  )
+              }
+        
+              var res = { accessToken: tk };
+              response.status(201).send( JSON.stringify(res))
+            })
+        }
+      })
+      ///
+
+
+
+ 
   });
 
+//API: Log In User
+  router.post('/loginAccount', (request, response) => {
+    
+    const pwd =  request.body.password;
+    let hash = crypto.createHash('sha256').update(pwd).digest('base64');
+    var today = new Date(new Date().getTime()+(5*24*60*60*1000));
+    var tk = crypto.randomBytes(20).toString('hex') ;
+    const valuesR1 = [request.body.email, hash ]
+    const valuesR2 = [ tk , today,request.body.email ]
+
+    pool.query('SELECT * FROM account WHERE email = $1 AND password = $2', valuesR1, (error, results) => {
+      if (error) {
+        throw error
+      }
+
+      if (results.rowCount == 0){
+        response.status(404).send(JSON.stringify({message: `Could Not Login: Invalid login credentials`}))
+      }else{
+       // response.status(200).json(results.rows)
+        pool.query('UPDATE account SET accessToken = $1 , expiration = $2 WHERE email = $3', valuesR2,
+            (error, results) => {
+            if (error) {
+                throw error
+            }
+            var res = { accessToken: tk };
+
+            response.status(201).send( JSON.stringify(res))
+            }
+        )
+
+       
+      }
+      
+    })
+  });
 
 
 module.exports = router
