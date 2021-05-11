@@ -1,16 +1,15 @@
 var express = require('express');
 var router = express.Router()
+const apiAdapter = require('./apiAdapter')
+
+const BASE_URL = 'http://localhost:3000'
+const api = apiAdapter(BASE_URL)
+
 
 router.get('/account', (req, res) => {
-  res.send(req.path + " called")
-})
-
-router.get('/account/:hashtag', (req, res) => {
-  res.send(req.path + " called")
-})
-
-router.post('/account', (req, res) => {
-  res.send(req.path + " called")
-})
+    api.get(req.path).then(resp => {
+      res.send(resp.data)
+    })
+  })
 
 module.exports = router
