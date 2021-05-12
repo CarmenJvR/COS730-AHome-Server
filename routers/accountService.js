@@ -58,7 +58,7 @@ router.post('/createAccount', async (req, res) => {
     //const result = await client.query('SELECT * FROM account');
     //const results = { 'results': (result) ? result.rows : null};
    // res.send(JSON.stringify(results));
-   pool.query('SELECT * FROM account WHERE email=$1', value ,(error, results) => {
+   client.query('SELECT * FROM account WHERE email=$1', value ,(error, results) => {
     if (error) {
      throw error
     }
@@ -68,17 +68,17 @@ router.post('/createAccount', async (req, res) => {
       res.status(404).send( JSON.stringify({message: `Could Not Register: Email already in use`}) )
     }else{
         //Email Not Used: Create Account
-        pool.query('INSERT INTO account (email, password, accessToken, expiration) VALUES ($1, $2, $3, $4)', values ,(error, results) => {
+        client.query('INSERT INTO account (email, password, accessToken, expiration) VALUES ($1, $2, $3, $4)', values ,(error, results) => {
           if (error) {
            //throw error
            res.status(404).send( JSON.stringify({message: `Could Not Register: Could not Insert new user`})  )
           }
     
-          var respond = { accessToken: tk };
-          res.status(201).send( JSON.stringify(respond))
-        })
-    }
-  })
+            var respond = { accessToken: tk };
+            res.status(201).send( JSON.stringify(respond))
+          })
+      }
+    })
 
 
     client.release();
