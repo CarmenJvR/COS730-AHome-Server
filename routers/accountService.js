@@ -76,7 +76,7 @@ router.post('/createAccount', async (req, res) => {
            res.status(404).send( JSON.stringify({message: 'Could Not Register: Could not Insert new user'})  )
           }
     
-            var respond = { accessToken: tk  , ac: results.rows[0]};
+            var respond = { accessToken: tk  , ac: results.rows[0].id};
             res.status(201).send( JSON.stringify(respond))
           })
       }
@@ -114,12 +114,14 @@ router.post('/loginAccount', async (req, res) => {
           var resObj = {message: 'Could Not Login: Invalid login credentials'};
           res.status(200).send(JSON.stringify(resObj)) ;
         }else{
+          const uAC = results.rows[0].id;
+
           client.query('UPDATE account SET accessToken = $1 , expiration = $2 WHERE email = $3', valuesR2,
               (error, results) => {
               if (error) {
                   throw error
               }
-                var respond = { accessToken: tk };
+                var respond = { accessToken: tk, ac: uAC };
                 res.status(201).send( JSON.stringify(respond))
               }
           )
