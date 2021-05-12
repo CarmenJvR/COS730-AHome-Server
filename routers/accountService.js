@@ -140,7 +140,7 @@ router.post('/loginAccount', async (req, res) => {
 
 //API: Get Project List
 
-router.get('/projectList', async (req, res) => {
+router.post('/projectList', async (req, res) => {
   try {
     const client = await pool.connect();
 
