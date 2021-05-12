@@ -48,12 +48,12 @@ router.post('/createAccount', async (req, res) => {
   try {
     const client = await pool.connect();
 
-    const pwd =  request.body.password;
+    const pwd =  req.body.password;
     let hash = crypto.createHash('sha256').update(pwd).digest('base64');
     var tk = crypto.randomBytes(20).toString('hex') ;
     var today = new Date(new Date().getTime()+(5*24*60*60*1000));
-    const values = [request.body.email, hash, tk , today  ]
-    const value = [request.body.email]
+    const values = [req.body.email, hash, tk , today  ]
+    const value = [req.body.email]
 
     //const result = await client.query('SELECT * FROM account');
     //const results = { 'results': (result) ? result.rows : null};
