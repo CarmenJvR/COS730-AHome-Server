@@ -70,13 +70,13 @@ router.post('/createAccount', async (req, res) => {
       res.status(200).send( JSON.stringify({message: 'Could Not Register: Email already in use'}) )
     }else{
         //Email Not Used: Create Account
-        client.query('INSERT INTO account (email, password, accessToken, expiration) VALUES ($1, $2, $3, $4)  RETURNING ID', values ,(error, results) => {
+        client.query('INSERT INTO account (email, password, accessToken, expiration) VALUES ($1, $2, $3, $4) RETURNING id', values ,(error, results) => {
           if (error) {
            //throw error
            res.status(404).send( JSON.stringify({message: 'Could Not Register: Could not Insert new user'})  )
           }
     
-            var respond = { accessToken: tk  , ac: results.ID};
+            var respond = { accessToken: tk  , ac: results.rows[0]};
             res.status(201).send( JSON.stringify(respond))
           })
       }
