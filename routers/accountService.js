@@ -143,9 +143,23 @@ router.post('/loginAccount', async (req, res) => {
 router.get('/projectList', async (req, res) => {
   try {
     const client = await pool.connect();
-    const result = await client.query('SELECT * FROM project');
-    const results = { 'results': (result) ? result.rows : null};
-    res.send(JSON.stringify(results));
+
+    const valuesR1 = [req.body.aq]
+    const result = await client.query('SELECT * FROM project WHERE account_id = $1');
+
+
+    client.query('SELECT * FROM project WHERE account_id=$1', valueR1 ,(error, results) => {
+      if (error) {
+       throw error
+      }
+      
+      res.send(JSON.stringify(results));
+      
+      })
+
+
+    //const results = { 'results': (result) ? result.rows : null};
+    
     client.release();
   } catch (err) {
     console.error(err);
