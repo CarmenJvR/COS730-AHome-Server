@@ -17,11 +17,11 @@ const pool = new Pool({
   }
 });
 
-/* app.get('/', (req, res) => {
-    res.send("Simple API Gateway")
-}) */
+ app.get('/', (req, res) => {
+    res.send("API Gateway running for a-home")
+}) 
 
-app.get('/db', async (req, res) => {
+/**app.get('/db', async (req, res) => {
     try {
       const client = await pool.connect();
       const result = await client.query('SELECT * FROM account');
@@ -32,7 +32,7 @@ app.get('/db', async (req, res) => {
       console.error(err);
       res.send("Error " + err);
     }
-  })
+  }) */
 
 app.use(router)
 
