@@ -48,16 +48,14 @@ router.post('/createAccount', async (req, res) => {
   try {
     const client = await pool.connect();
 
-    const pwd =  req.body.password;
-    let hash = crypto.createHash('sha256').update(pwd).digest('base64');
-    var tk = crypto.randomBytes(20).toString('hex') ;
-    var today = new Date(new Date().getTime()+(5*24*60*60*1000));
-    const values = [req.body.email, hash, tk , today  ]
-    const value = [req.body.email]
+    //request variables
+      const pwd =  req.body.password;
+      let hash = crypto.createHash('sha256').update(pwd).digest('base64');
+      var tk = crypto.randomBytes(20).toString('hex') ;
+      var today = new Date(new Date().getTime()+(5*24*60*60*1000));
+      const values = [req.body.email, hash, tk , today  ]
+      const value = [req.body.email]
 
-    //const result = await client.query('SELECT * FROM account');
-    //const results = { 'results': (result) ? result.rows : null};
-   // res.send(JSON.stringify(results));
    client.query('SELECT * FROM account WHERE email=$1', value ,(error, results) => {
     if (error) {
      throw error
@@ -80,6 +78,46 @@ router.post('/createAccount', async (req, res) => {
       }
     })
 
+
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+})
+
+//API: Log In User
+router.post('/loginAccount', async (req, res) => {
+  try {
+    const client = await pool.connect();
+
+    //request variables
+      const pwd =  req.body.password;
+      let hash = crypto.createHash('sha256').update(pwd).digest('base64');
+      var today = new Date(new Date().getTime()+(5*24*60*60*1000));
+      var tk = crypto.randomBytes(20).toString('hex') ;
+      const valuesR1 = [req.body.email, hash ]
+      const valuesR2 = [ tk , today,req.body.email ]
+
+      client.query('SELECT * FROM account WHERE email = $1 AND password = $2', valuesR1, (error, results) => {
+        if (error) {
+          throw error
+        }
+  
+        if (results.rowCount == 0){
+          res.status(404).send(JSON.stringify({message: `Could Not Login: Invalid login credentials`}))
+        }else{
+          client.query('UPDATE account SET accessToken = $1 , expiration = $2 WHERE email = $3', valuesR2,
+              (error, results) => {
+              if (error) {
+                  throw error
+              }
+                var result = { accessToken: tk };
+                res.status(201).send( JSON.stringify(result))
+              }
+          )
+        }
+      })
 
     client.release();
   } catch (err) {
