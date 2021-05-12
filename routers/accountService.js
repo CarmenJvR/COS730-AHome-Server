@@ -63,7 +63,7 @@ router.post('/createAccount', async (req, res) => {
 
     if (results.rows.length > 0){
       //Email Already used: Reject Register
-      res.status(204).send( JSON.stringify({message: 'Could Not Register: Email already in use'}) )
+      res.status(200).send( JSON.stringify({message: 'Could Not Register: Email already in use'}) )
     }else{
         //Email Not Used: Create Account
         client.query('INSERT INTO account (email, password, accessToken, expiration) VALUES ($1, $2, $3, $4)', values ,(error, results) => {
@@ -103,12 +103,12 @@ router.post('/loginAccount', async (req, res) => {
         if (error) {
          // throw error
          var resObj1 = {message: 'Could Not Login'};
-         res.status(204).send(JSON.stringify(resObj1)) ;
+         res.status(200).send(JSON.stringify(resObj1)) ;
         }
   
         if (results.rows.length == 0){
           var resObj = {message: 'Could Not Login: Invalid login credentials'};
-          res.status(204).send(JSON.stringify(resObj)) ;
+          res.status(200).send(JSON.stringify(resObj)) ;
         }else{
           client.query('UPDATE account SET accessToken = $1 , expiration = $2 WHERE email = $3', valuesR2,
               (error, results) => {
