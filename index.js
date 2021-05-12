@@ -9,13 +9,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 const port = process.env.PORT || 3000;
 
+/*
 const { Pool } = require('pg');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }
-});
+}); */
 
  app.get('/', (req, res) => {
     res.send("API Gateway running for a-home")

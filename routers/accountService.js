@@ -6,6 +6,7 @@ const BASE_URL = 'http://localhost:3000'
 const api = apiAdapter(BASE_URL)
 
 // Configuration for PostgreSQL connection
+//connect local
 /**const Pool = require('pg').Pool
 const pool = new Pool({
   user: 'sysadmin',
@@ -14,6 +15,7 @@ const pool = new Pool({
   password: '1234',
   port: 5433,
 }) */
+
 //connect to postgersql heroku
 const { Pool } = require('pg');
 const pool = new Pool({
@@ -23,6 +25,7 @@ const pool = new Pool({
   }
 });
 
+//test api for connection
 router.get('/db', async (req, res) => {
   try {
     const client = await pool.connect();
@@ -40,6 +43,52 @@ router.get('/db', async (req, res) => {
 // Cryptography Dependencies
 const crypto = require('crypto');
 
+//API: Register New User
+router.get('/createAccount', async (req, res) => {
+  try {
+    const client = await pool.connect();
+
+    const pwd =  request.body.password;
+    let hash = crypto.createHash('sha256').update(pwd).digest('base64');
+    var tk = crypto.randomBytes(20).toString('hex') ;
+    var today = new Date(new Date().getTime()+(5*24*60*60*1000));
+    const values = [request.body.email, hash, tk , today  ]
+    const value = [request.body.email]
+
+    //const result = await client.query('SELECT * FROM account');
+    //const results = { 'results': (result) ? result.rows : null};
+   // res.send(JSON.stringify(results));
+   pool.query('SELECT * FROM account WHERE email=$1', value ,(error, results) => {
+    if (error) {
+     throw error
+    }
+
+    if (results.rowCount > 0){
+      //Email Already used: Reject Register
+      res.status(404).send( JSON.stringify({message: `Could Not Register: Email already in use`}) )
+    }else{
+        //Email Not Used: Create Account
+        pool.query('INSERT INTO account (email, password, accessToken, expiration) VALUES ($1, $2, $3, $4)', values ,(error, results) => {
+          if (error) {
+           //throw error
+           res.status(404).send( JSON.stringify({message: `Could Not Register: Could not Insert new user`})  )
+          }
+    
+          var respond = { accessToken: tk };
+          res.status(201).send( JSON.stringify(respond))
+        })
+    }
+  })
+
+
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+})
+
+/**
 //API: Get All Accounts
   router.get('/getAccounts', (req, res) => {
     pool.query('SELECT * FROM account ORDER BY id ASC', (error, results) => {
@@ -126,5 +175,6 @@ const crypto = require('crypto');
     })
   });
 
+  */
 
 module.exports = router
