@@ -44,7 +44,7 @@ router.get('/db', async (req, res) => {
 const crypto = require('crypto');
 
 //API: Register New User
-router.get('/createAccount', async (req, res) => {
+router.post('/createAccount', async (req, res) => {
   try {
     const client = await pool.connect();
 
