@@ -101,7 +101,8 @@ router.post('/loginAccount', async (req, res) => {
 
       client.query('SELECT * FROM account WHERE email = $1 AND password = $2', valuesR1, (error, results) => {
         if (error) {
-          throw error
+         // throw error
+          res.status(204).send(JSON.stringify({message: `Could Not Login`}))
         }
   
         if (results.rowCount == 0){
