@@ -145,10 +145,8 @@ router.post('/projectList', async (req, res) => {
     const client = await pool.connect();
 
     const valuesR1 = [req.body.ac]
-    const result = await client.query('SELECT * FROM project WHERE account_id = $1');
 
-
-    client.query('SELECT * FROM project WHERE account_id=$1', valuesR1 ,(error, results) => {
+    client.query('SELECT * FROM project WHERE account_id = $1', valuesR1 ,(error, results) => {
       if (error) {
        throw error
       }
