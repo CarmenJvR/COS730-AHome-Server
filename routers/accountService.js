@@ -384,7 +384,7 @@ router.post('/updateBudget', async (req, res) => {
 
     const valuesR1 = [req.body.total , req.body.pid]
 
-    client.query('UPDATE project SET budget_total=$1 WHERE project_id = $2', valuesR1 ,(error, results) => {
+    client.query('UPDATE project SET budget_total=$1 WHERE ID=$2', valuesR1 ,(error, results) => {
       if (error) {
         res.status(404).send( JSON.stringify({error: 'Could Not Update Budget Total'})  )
       }
@@ -399,6 +399,32 @@ router.post('/updateBudget', async (req, res) => {
   }
 });
 
+
+//API: Remove Expense
+router.post('/removeExpense', async (req, res) => {
+  try {
+    const client = await pool.connect();
+
+    //request variables
+      const values = [req.body.pid]
+
+        //Email Not Used: Create Task
+        client.query('DELETE FROM budget WHERE ID=$1', values ,(error, results) => {
+          if (error) {
+           //throw error
+           res.status(404).send( JSON.stringify({error: 'Could Not Cancel Expense'})  )
+          }
+    
+            var respond = { message : 'Expense successfully removed'};
+            res.status(201).send( JSON.stringify(respond))
+          })
+      
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+});
 
 module.exports = router
 
