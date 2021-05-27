@@ -399,6 +399,29 @@ router.post('/updateBudget', async (req, res) => {
   }
 });
 
+//API: Update Budget Total
+
+router.post('/updateExpense', async (req, res) => {
+  try {
+    const client = await pool.connect();
+
+    const valuesR1 = [req.body.status , req.body.eid]
+
+    client.query('UPDATE budget SET status=$1 WHERE ID=$2', valuesR1 ,(error, results) => {
+      if (error) {
+        res.status(404).send( JSON.stringify({error: 'Could Not Update Expense Status'})  )
+      }
+      
+        var respond = { message : 'Expense Status Updated'};
+        res.send(JSON.stringify(respond));
+      })
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+});
+
 
 //API: Remove Expense
 router.post('/removeExpense', async (req, res) => {
