@@ -573,7 +573,7 @@ router.post('/removeGuest', async (req, res) => {
            res.status(404).send( JSON.stringify({error: 'Could Not Remove Guest Viewer'})  )
           }
     
-            var respond = { message : 'Event Successfully Removed Guest Viewer'};
+            var respond = { message : 'Successfully Removed Guest Viewer'};
             res.status(201).send( JSON.stringify(respond))
           })
       
