@@ -626,7 +626,8 @@ router.post('/loginGuest', async (req, res) => {
           var resObj = {message: 'Could Not Login: Guest User not found'};
           res.status(200).send(JSON.stringify(resObj)) ;
         }else{
-            var respond = { message: 'Guest access granted'};
+            const gAC = results.rows[0].id;
+            var respond = { gid: gAC};
             res.status(201).send( JSON.stringify(respond))
         }
       })
