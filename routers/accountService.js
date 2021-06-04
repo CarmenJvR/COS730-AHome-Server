@@ -613,9 +613,9 @@ router.post('/loginGuest', async (req, res) => {
     const client = await pool.connect();
 
     //request variables
-      const valuesR1 = [req.body.name , req.body.email ]
+      const valuesR1 = [req.body.email ]
 
-      client.query('SELECT * FROM guest WHERE name = $1 AND email = $2', valuesR1, (error, results) => {
+      client.query('SELECT * FROM guest WHERE email = $1', valuesR1, (error, results) => {
         if (error) {
          // throw error
          var resObj1 = {message: 'Could Not Login'};
