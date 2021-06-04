@@ -606,5 +606,61 @@ router.post('/guestList', async (req, res) => {
   }
 });
 
+
+//API: Log In User
+router.post('/loginGuest', async (req, res) => {
+  try {
+    const client = await pool.connect();
+
+    //request variables
+      const valuesR1 = [req.body.name , req.body.email ]
+
+      client.query('SELECT * FROM guest WHERE name = $1 AND email = $2', valuesR1, (error, results) => {
+        if (error) {
+         // throw error
+         var resObj1 = {message: 'Could Not Login'};
+         res.status(200).send(JSON.stringify(resObj1)) ;
+        }
+  
+        if (results.rows.length == 0){
+          var resObj = {message: 'Could Not Login: Guest User not found'};
+          res.status(200).send(JSON.stringify(resObj)) ;
+        }else{
+            var respond = { message: 'Guest access granted'};
+            res.status(201).send( JSON.stringify(respond))
+        }
+      })
+
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+});
+
+//API: Get Guest List
+router.post('/guestProjectList', async (req, res) => {
+  try {
+    const client = await pool.connect();
+
+    const valuesR1 = [req.body.gid]
+
+    client.query('SELECT ID, name FROM project WHERE ID IN (SELECT project_id FROM guest WHERE ID=$1)', valuesR1 ,(error, results) => {
+      if (error) {
+       throw error
+      }
+      
+        const respond = { 'results': (results) ? results.rows : null};
+        res.send(JSON.stringify(respond));
+      })
+    client.release();
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  }
+});
+
+
+
 module.exports = router
 
