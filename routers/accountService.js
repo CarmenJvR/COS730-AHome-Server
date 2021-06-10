@@ -332,7 +332,7 @@ router.post('/removeVisual', async (req, res) => {
       const values = [req.body.pid]
 
         //Email Not Used: Create Task
-        client.query('DELETE FROM visual WHERE ID=$1', values ,(error, results) => {
+        client.query('DELETE FROM board WHERE ID=$1', values ,(error, results) => {
           if (error) {
            //throw error
            res.status(404).send( JSON.stringify({error: 'Could Not Remove Image'})  )
